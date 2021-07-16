@@ -2,7 +2,7 @@ import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function ProfileSidebar(propriedades) {
   console.log(propriedades);
@@ -21,8 +21,31 @@ function ProfileSidebar(propriedades) {
   )
 }
 
+function ProfileRelationsBox(props) {
+  return (
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">
+        {props.title} ({props.items.length})
+      </h2>
+
+      <ul>
+        {/* {seguidores.map((itemAtual) => {
+          return (
+            <li key={itemAtual}>
+              <a href={`/users/${itemAtual}`} >
+                <img src={itemAtual} />
+                <span>{itemAtual}</span>
+              </a>
+            </li>
+          )
+        })} */}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
-  const usuarioAleatorio = 'thiagoaraujocampos';
+  const githubUser = 'thiagoaraujocampos';
   const [comunidades, setComunidades] = useState([{
     id: new Date().toISOString(),
     title: 'Eu odeio acordar cedo', 
@@ -37,13 +60,21 @@ export default function Home() {
     'diego3g',
   ]
 
+  const [seguidores, setSeguidores] = useState([])
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/thiagoaraujocampos/followers')
+      .then((response) => response.json())
+      .then((response) => setSeguidores(response))
+  }, [])
+
   return (
     <>
       <AlurakutMenu />
       <MainGrid>
         {/* <Box style="grid-area: profileArea;"> */}
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
-          <ProfileSidebar githubUser={usuarioAleatorio} />
+          <ProfileSidebar githubUser={githubUser} />
         </div>
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box>
@@ -95,6 +126,9 @@ export default function Home() {
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
+
+          <ProfileRelationsBox title="Seguidores" items={seguidores} /> 
+          
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
               Minhas comunidades ({comunidades.length})
