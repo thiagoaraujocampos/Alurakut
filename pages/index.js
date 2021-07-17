@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
+
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import { useEffect, useState } from 'react';
 
 function ProfileSidebar(propriedades) {
   console.log(propriedades);
@@ -44,9 +47,11 @@ function ProfileRelationsBox(props) {
   )
 }
 
-export default function Home() {
-  const githubUser = 'thiagoaraujocampos';
+export default function Home(props) {
   const [comunidades, setComunidades] = useState([]); 
+  const [seguidores, setSeguidores] = useState([])
+  
+  const githubUser = props.githubUser;
   const pessoasFavoritas = [
     'kaarpage',
     'SaraO3O',
@@ -56,7 +61,6 @@ export default function Home() {
     'diego3g',
   ]
 
-  const [seguidores, setSeguidores] = useState([])
 
   useEffect(() => {
     fetch('https://api.github.com/users/thiagoaraujocampos/followers')
@@ -198,4 +202,30 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const token = nookies.get(context).USER_TOKEN;
+  const { isAuthenticated } = await fetch('https://alurakut-pi-gules.vercel.app/api/auth', {
+    headers: {
+        Authorization: token
+      }
+  })
+  .then((resposta) => resposta.json()) 
+
+  if(!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    },
+  }
 }
