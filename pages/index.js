@@ -32,40 +32,41 @@ function ProfileRelationsBox(props) {
       </h2>
 
       <ul>
-        {/* {seguidores.map((itemAtual) => {
-          return (
-            <li key={itemAtual}>
-              <a href={`/users/${itemAtual}`} >
-                <img src={itemAtual} />
-                <span>{itemAtual}</span>
-              </a>
-            </li>
-          )
-        })} */}
+        {
+          props.items.map((itemAtual, index) => {
+            if(index < 6) {
+              return (
+                <li key={itemAtual.id}>
+                  <a href={`https://github.com/${itemAtual.login}`} >
+                    <img src={itemAtual.avatar_url} />
+                    <span>{itemAtual.login}</span>
+                  </a>
+                </li>
+              )
+            }
+            return;
+          })
+        }
       </ul>
     </ProfileRelationsBoxWrapper>
   )
 }
 
 export default function Home(props) {
-  const [comunidades, setComunidades] = useState([]); 
+  const [comunidades, setComunidades] = useState([])
   const [seguidores, setSeguidores] = useState([])
+  const [seguidos, setSeguidos] = useState([])
   
   const githubUser = props.githubUser;
-  const pessoasFavoritas = [
-    'kaarpage',
-    'SaraO3O',
-    'Bruno12leonel',
-    'lauragrassig',
-    'LauraBeatris',
-    'diego3g',
-  ]
-
 
   useEffect(() => {
-    fetch('https://api.github.com/users/thiagoaraujocampos/followers')
+    fetch(`https://api.github.com/users/${githubUser}/followers`)
       .then((response) => response.json())
       .then((response) => setSeguidores(response))
+
+    fetch(`https://api.github.com/users/${githubUser}/following`)
+      .then((response) => response.json())
+      .then((response) => setSeguidos(response))
 
     fetch('https://graphql.datocms.com/', {
       method: 'POST',
@@ -91,7 +92,7 @@ export default function Home(props) {
 
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={githubUser}/>
       <MainGrid>
         {/* <Box style="grid-area: profileArea;"> */}
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
@@ -167,37 +168,26 @@ export default function Home(props) {
             </h2>
 
             <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.id}>
-                    <a href={`/communities/${itemAtual.id}`} >
-                      <img src={itemAtual.imageUrl} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
+              {
+                comunidades.map((itemAtual, index) => {
+                  if(index < 6) {
+                    return (
+                      <li key={itemAtual.id}>
+                        <a href={`/communities/${itemAtual.id}`} >
+                          <img src={itemAtual.imageUrl} />
+                          <span>{itemAtual.title}</span>
+                        </a>
+                      </li>
+                    )
+                  }
+                  return;
+                })
+              }
             </ul>
           </ProfileRelationsBoxWrapper>
-          
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Pessoas da comunidade ({pessoasFavoritas.length})
-            </h2>
 
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => {
-                return (
-                  <li key={itemAtual}>
-                    <a href={`/users/${itemAtual}`} >
-                      <img src={`https://github.com/${itemAtual}.png`} />
-                      <span>{itemAtual}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Pessoas da comunidade" items={seguidos} /> 
+          
         </div>
       </MainGrid>
     </>
@@ -217,6 +207,7 @@ export async function getServerSideProps(context) {
     return {
       redirect: {
         destination: '/login',
+        teste: 'a',
         permanent: false,
       }
     }
