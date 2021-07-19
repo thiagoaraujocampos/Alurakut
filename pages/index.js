@@ -125,6 +125,11 @@ export default function Home(props) {
                   creatorSlug: githubUser,
                 }
 
+                document.querySelector('input[name="title"]').value = '';
+                document.querySelector('input[name="image"]').value = '';
+
+
+
                 fetch('/api/comunidades', { 
                   method: 'POST',
                   headers: {
@@ -146,6 +151,7 @@ export default function Home(props) {
                   name="title"
                   aria-label="Qual vai ser o nome da sua comunidade?"
                   type="text"
+                  autocomplete="off"
                 />
               </div>
               <div>
@@ -154,6 +160,7 @@ export default function Home(props) {
                   name="image"
                   aria-label="Coloque uma URL para usarmos de capa"
                   type="text"
+                  autocomplete="off"
                 />
               </div>
 
