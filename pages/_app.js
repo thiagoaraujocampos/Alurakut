@@ -1,5 +1,6 @@
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { AlurakutStyles } from '../src/lib/AlurakutCommons';
+import { AuthProvider } from '../src/contexts/AuthContext';
 
 const GlobalStyle = createGlobalStyle`
   /* Reset CSS (Necolas Reset CSS <3) */
@@ -34,10 +35,12 @@ const theme = {
 export default function App({ Component, pageProps }) {
   return (
     <>
-      <GlobalStyle />
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <AuthProvider>
+        <GlobalStyle />
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </AuthProvider>
     </>
   )
 }

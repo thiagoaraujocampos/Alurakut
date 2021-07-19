@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import nookies from 'nookies'
-import jwt from 'jsonwebtoken'
 
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
@@ -8,7 +7,6 @@ import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet 
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 
 function ProfileSidebar(propriedades) {
-  console.log(propriedades);
   return (
     <Box as="aside">
       <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px' }} />
@@ -56,10 +54,16 @@ export default function Home(props) {
   const [comunidades, setComunidades] = useState([])
   const [seguidores, setSeguidores] = useState([])
   const [seguidos, setSeguidos] = useState([])
-  
-  const githubUser = props.githubUser;
+  const [name, setName] = useState('')
+  const user = JSON.parse(props.currentUser)
+
+  const githubUser = user.username;
 
   useEffect(() => {
+    fetch(`https://api.github.com/users/${user.username}`)
+      .then((response) => response.json())
+      .then((response) => setName(response.name));
+
     fetch(`https://api.github.com/users/${githubUser}/followers`)
       .then((response) => response.json())
       .then((response) => setSeguidores(response))
@@ -101,7 +105,8 @@ export default function Home(props) {
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box>
             <h1 className="title">
-              Bem vindo(a) 
+              Bem vindo(a), <br />
+              {name}
             </h1>
 
             <OrkutNostalgicIconSet />
@@ -195,28 +200,21 @@ export default function Home(props) {
 }
 
 export async function getServerSideProps(context) {
-  const token = nookies.get(context).USER_TOKEN;
-  const { isAuthenticated } = await fetch('https://alurakut-pi-gules.vercel.app/api/auth', {
-    headers: {
-        Authorization: token
-      }
-  })
-  .then((resposta) => resposta.json()) 
+  const currentUser = nookies.get(context).CURRENT_USER;
 
-  if(!isAuthenticated) {
+  if(!currentUser) {
+    nookies.destroy('CURRENT_USER')
     return {
       redirect: {
         destination: '/login',
-        teste: 'a',
         permanent: false,
       }
     }
   }
 
-  const { githubUser } = jwt.decode(token);
   return {
     props: {
-      githubUser
+      currentUser,
     },
   }
 }

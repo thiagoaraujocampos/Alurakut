@@ -38,7 +38,7 @@ export function AlurakutMenu({ githubUser }) {
 
         <nav>
           <a onClick={() => {
-            nookies.destroy(null, 'USER_TOKEN')
+            nookies.destroy('CURRENT_USER')
             router.push('/login')
           }}>
             Sair
@@ -218,7 +218,7 @@ export function AlurakutProfileSidebarMenuDefault() {
             GitHub Trends
           </a>
         <a onClick={() => {
-          nookies.destroy(null, 'USER_TOKEN')
+          nookies.destroy('CURRENT_USER')
           router.push('/login')
         }}>
           <img src={`${BASE_URL}//icons/logout.svg`} />
