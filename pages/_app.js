@@ -35,12 +35,12 @@ const theme = {
 export default function App({ Component, pageProps }) {
   return (
     <>
-      <AuthProvider>
         <GlobalStyle />
         <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
+          <AuthProvider>
+            <Component {...pageProps} />
+          </AuthProvider>
         </ThemeProvider>
-      </AuthProvider>
     </>
   )
 }
